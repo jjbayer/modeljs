@@ -1,0 +1,53 @@
+<html>
+<head>
+    <script
+    src="https://code.jquery.com/jquery-3.2.1.min.js"
+    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+    <script type="text/javascript" src="../js/object.js"></script>
+    <script type="text/javascript" src="../js/model.js"></script>
+    <script type="text/javascript">
+
+        Task = new Model({
+            name: 'task',
+            url: "https://jsonplaceholder.typicode.com/todos",
+            parent: "#task-list",
+            dom: {
+                tag: "li",
+                children: [
+                {tag:'input', type:"checkbox"},
+                " {{ this.data.title }}"
+                ]
+            },
+            hooks: {
+                postRender:function() {
+                    if( this.data.completed ) {
+                        this.element.find('input').attr('checked', "checked");
+                    }
+                }
+            }
+        });
+
+        $(document).ready(function() {
+
+            $.get(Task.config.url, function(data) {
+                data = data.slice(0, 10);
+                $.each(data, function(i, item) {
+                    var task = new Task(item);
+                    task.render();
+                });
+            });
+
+        });
+
+    </script>
+
+</head>
+
+<body>
+    <ul id="task-list"></ul>
+</body>
+
+
+</html>
