@@ -14,12 +14,12 @@ function object2dom(obj)
 			for(var i = 0; i < children.length; i++) {
   				var child = children[i]
   				if(isObject(child)) {
-  					element.appendChild(object2dom(child))	
+  					element.appendChild(object2dom(child))
   				} else {
   					// TODO: error handling
   					element.appendChild(document.createTextNode(child))
   				}
-  				
+
   			}
   		} else if(key == 'style') {
   			for(styleKey in obj[key]) {
@@ -72,7 +72,7 @@ function fillTemplates(obj, context)
 	return visitObject(obj, function(value) {
 		if(typeof value == 'function') {
 			return value(context)
-		} 
+		}
 
 		return value
 
@@ -87,7 +87,7 @@ function Model(config)
 {
 	config.dom = mergeObjects([DEFAULT_DOM, config.dom])
 	compileTemplates(config.dom)
-	
+
 
 	// Returned class
 	function _model(data) {
@@ -96,7 +96,7 @@ function Model(config)
 
 		// Make a copy of dom so it can be altered per-instance
 		this.dom = deepCopyObject(config.dom)
-		
+
 		// New objects
 		if(isUndefined(this.data.id)) {
 			this.data.id = --UNSAVED_ID
@@ -123,6 +123,10 @@ function Model(config)
 		return ret
 	}
 
+	_model.removeAll = function() {
+		$.each(_model.instances, function(i, item) { item.remove()})
+	}
+
 	_model.prototype.config = config
 
 	// Instance methods
@@ -137,7 +141,7 @@ function Model(config)
 	// }
 
 	_model.prototype.save = function() {
-		
+
 		var instance = this
 		var deferred
 
@@ -150,7 +154,7 @@ function Model(config)
 				console.log("created")
 				delete _model.instances[instance.data.id]
 				_model.instances[data.id] = instance
-				instance.data.id = data.id // TODO: Should load all data from server, but POST return is not hierarchical. Django REST issue? 
+				instance.data.id = data.id // TODO: Should load all data from server, but POST return is not hierarchical. Django REST issue?
 
 				instance.render()
 				instance.runHook('postSave')
@@ -173,15 +177,15 @@ function Model(config)
 	_model.prototype.id = function() { return this.data.id }
 
 	_model.prototype.remove = function(dbOnly) {
-		
+
 		var deferred
 
 		this.runHook('preRemove')
-		
+
 		if( ! this.isNew() ) {
 			deferred = $.ajax(prepareURL(this.url()), {method: 'DELETE'})
 		}
-		
+
 		if(! dbOnly ) this.element.remove()
 
 		delete _model.instances[this.data.id]
@@ -204,17 +208,17 @@ function Model(config)
 
 		var dom = this.dom
 		var parent = $(Handlebars.compile(this.config.parent)(this))  // TODO: compile only once
-		
+
 		// TODO: recursively instantiate template
 		var filled = fillTemplates(dom, this)
-		
+
 		element = object2dom(filled)
-		
+
 
 		if(this.element && this.element.length) {
 			this.element.replaceWith(element)
 		} else {
-			parent.append(element)	
+			parent.append(element)
 		}
 
 		this.element = $('#' + filled.id)
@@ -229,7 +233,7 @@ function Model(config)
 			throw "unsaved object has no URL"
 		}
 
-		return this.config.url + "/" + this.data.id 
+		return this.config.url + "/" + this.data.id
 	}
 
 	_model.prototype.runHook = function(hookName) {
