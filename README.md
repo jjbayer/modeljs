@@ -5,7 +5,7 @@ Hook up a javascript model class to a JSON API endpoint and declare the correspo
 
 ## Usage
 
-See [example](example/example.html).
+See [examples](examples).
 
 ### Example code:
 
@@ -33,4 +33,4 @@ Task = new Model({
 
 ### Result:
 
-![todo list](example/screenshot.png)
+![todo list](examples/screenshot.png)
